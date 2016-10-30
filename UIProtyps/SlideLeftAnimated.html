@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://openlayers.org/en/v3.19.1/css/ol.css" type="text/css">
+        <style>
+            body {
+                font-family: "Lato", sans-serif;
+            }
+
+            .sidenav {
+                height: 100%;
+                width: 0;
+                position: fixed;
+                z-index: 1;
+                top: 0;
+                left: 0;
+                background-color: = "white";
+                overflow-x: hidden;
+                transition: 0.5s;
+                padding-top: 60px;
+            }
+
+            .sidenav a {
+                padding: 8px 8px 8px 32px;
+                text-decoration: none;
+                font-size: 25px;
+                color: #818181;
+                display: block;
+                transition: 0.3s
+            }
+
+            .sidenav a:hover, .offcanvas a:focus{
+                color: #f1f1f1;
+            }
+
+            .sidenav .closebtn {
+                position: absolute;
+                top: 0;
+                right: 25px;
+                font-size: 36px;
+                margin-left: 50px;
+            }
+
+            #main {
+                transition: margin-left .5s;
+                padding: 16px;
+            }
+
+            @media screen and (max-height: 450px) {
+                .sidenav {padding-top: 15px;}
+                .sidenav a {font-size: 18px;}
+            }
+        
+            .map {
+                height: 100%;
+                width: 100%;
+            }
+        </style>
+        <script src="https://openlayers.org/en/v3.19.1/build/ol.js" type="text/javascript"></script>
+        <title>OpenLayers 3 example</title>
+    </head>
+    <body>
+        <div id="mySidenav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <a href="#">About</a>
+            <a href="#">Services</a>
+            <a href="#">Clients</a>
+            <a href="#">Contact</a>
+        </div>
+
+        <div id="map" class="map"></div>
+        <script type="text/javascript">
+            var map = new ol.Map({
+                target: 'map',
+                layers: [
+                    new ol.layer.Tile({
+                        source: new ol.source.OSM()
+                    })
+                ],
+                view: new ol.View({
+                center: ol.proj.fromLonLat([9.992694,53.552050]),
+                zoom: 14
+                })  
+            });
+            
+            var markers = getMarker();
+            for(i = 0; i < markers.length; i++){
+                createTag(markers[i].hT, markers[i].lng, markers[i].lat);
+            }
+            
+            
+            
+            function createTag(hT, lng, lat){
+                var div = document.createElement("button");
+                var divLength = 9 * hT.length;
+                div.style.width = divLength + "px";
+                div.style.height = "18px";
+                div.style.borderRadius = "3px";
+                div.style.background = "red";
+                div.style.color = "white";
+                div.innerHTML = hT;
+                div.onclick = function(){
+                  loadStats(hT);
+                };
+                
+                var pos = ol.proj.fromLonLat([lng,lat]);
+                var tag = new ol.Overlay({position: pos, element: div});
+                
+                //tag.addEventListener('mousedown', loadStats(hT));
+                map.addOverlay(tag);
+            }
+            
+             function loadStats(hT){
+                var panel = document.getElementById('mySidenav');
+                while(panel.childElementCount > 0){
+                    panel.removeChild(panel.firstChild);
+                    
+                }
+                
+                var headLine = document.createElement("h2");
+                headLine.innerHTML = "Phrases relatet to:";
+                headLine.style.color = "grey";
+                panel.appendChild(headLine);
+                
+                var searchTag = document.createElement("h1");
+                searchTag.innerHTML = hT;
+                searchTag.style.color = "blue";
+                panel.appendChild(searchTag);
+                
+                var information = getTagInformation(hT);
+                for(i = 0; i < information.length; i++){
+                    panel.appendChild(createInformation(information[i].tag, information[i].mentions, information[i].sentiment));
+                }
+                 openNav();
+            }
+            
+            function createInformation(tag, mentions, sentiment){
+                var entry = document.createElement("div");
+                var word = document.createElement("h2");
+                word.innerHTML = tag;
+                var info = document.createElement("h3");
+                info.innerHTML = mentions + " mentions | Sentiment: " + sentiment;
+                entry.appendChild(word);
+                entry.appendChild(info);
+                return entry;
+            }
+            
+             function getMarker() {
+                'use strict';
+                var x = [{lat: 53.562050, lng: 9.992694, hT: "#Test1"},
+                        {lat: 53.555050, lng: 9.992694, hT: "#Test2"},
+                        {lat: 53.549050, lng: 9.992694, hT: "#Test3"},
+                        {lat: 53.552050, lng: 9.982694, hT: "#Test4"},
+                        {lat: 53.552050, lng: 10.002694, hT: "#Test5"},
+                        {lat: 53.549050, lng: 10.002694, hT: "#Test6"} ];
+                return x;        
+            }
+            
+            function getTagInformation(hashTag){
+                var x = [
+                            {tag: "halloween", mentions: 14, sentiment: 1.5},
+                            {tag: "party", mentions: 8, sentiment: 5.2},
+                            {tag: "#hochdiehändewochenende", mentions: 6, sentiment: 6.5},
+                            {tag: "#regen", mentions: 4, sentiment: -1.5},
+                            {tag: "#süßessonstgibtssaures", mentions: 3, sentiment: 5.5}
+                        ];
+                return x;
+            }
+            
+            function openNav() {
+                document.getElementById("mySidenav").style.width = "250px";
+                document.getElementById("map").style.marginLeft = "250px";
+            }
+
+            function closeNav() {
+                document.getElementById("mySidenav").style.width = "0";
+                document.getElementById("map").style.marginLeft= "0";
+            }
+        </script>
+    </body>
+</html>
+
