@@ -8,9 +8,12 @@
             }
 
             .sidenav {
+                padding: 0px 0px 0px 16px;
                 display: none;
                 height: 100%;
                 width: 20%;
+                min-width: 400px;
+                opacity: 0.9;
                 position: fixed;
                 z-index: 1;
                 top: 0;
@@ -18,6 +21,7 @@
                 background-color: #111;
                 overflow-x: hidden;
                 padding-top: 60px;
+                text-align: center;
             }
             
             .sidenav a {
@@ -50,9 +54,22 @@
                 height: 100%;
                 width: 100%;
             }
+            
+            .map a{
+                padding: 2px 4px 2px 4px;
+                text-decoration: none;
+                opacity: 0.8;
+                background-color: #111;
+                color: #e1e1e1;
+            }
+            
+            .map a:hover, .offcanvas a:focus{
+                color: #ffffff;
+            }
+
         </style>
         <script src="https://openlayers.org/en/v3.19.1/build/ol.js" type="text/javascript"></script>
-        <title>OpenLayers 3 example</title>
+        <title>OpenLayers 3 Gui</title>
     </head>
     <body>
         <div id="mySidenav" class="sidenav">
@@ -83,17 +100,16 @@
             
             
             function createTag(hT, lng, lat){
-                var div = document.createElement("button");
+                var div = document.createElement("a");
                 var divLength = 9 * hT.length;
                 div.style.width = divLength + "px";
-                div.style.height = "18px";
+                div.style.height = "20px";
                 div.style.borderRadius = "3px";
-                div.style.background = "red";
-                div.style.color = "white";
+                //div.style.background = "red";
+                //div.style.color = "white";
                 div.innerHTML = hT;
-                div.onclick = function(){
-                  loadStats(hT);
-                };
+                div.href = "javascript:void(0)"
+                div.onclick = function(){loadStats(hT);};
                 
                 var pos = ol.proj.fromLonLat([lng,lat]);
                 var tag = new ol.Overlay({position: pos, element: div});
@@ -169,12 +185,12 @@
             
             function openNav() {
                 document.getElementById("mySidenav").style.display = "block";
-                document.getElementById("map").style.marginLeft = "20%";
+                //document.getElementById("map").style.marginLeft = "20%";
             }
 
             function closeNav() {
                 document.getElementById("mySidenav").style.display = "none";
-                document.getElementById("map").style.marginLeft = "0";
+                //document.getElementById("map").style.marginLeft = "0";
             }
             
             function linkCall(hashTag){
