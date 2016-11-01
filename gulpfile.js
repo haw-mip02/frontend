@@ -5,8 +5,8 @@ let newer = require('gulp-newer')
 let stylus = require('gulp-stylus')
 
 let paths = {
-    client: ['app.js'],
-    clientBuild: 'build/',
+    client: ['public/app.js'],
+    clientBuild: 'public/build/',
     css: ['*.styl'],
 }
 

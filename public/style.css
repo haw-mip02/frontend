@@ -1,0 +1,23 @@
+
+html, body {
+    margin: 0;
+    height: 100%;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}
+
+.text-overlay {
+    padding: 3px 5px;
+    border-radius: 4px;
+    background: lime;
+    font-size: 16px;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
