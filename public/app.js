@@ -1,9 +1,12 @@
 
-function TextOverlay(map, pos, text) {
+let analysisAPI = 'http://127.0.0.1:5000/analysis/v1.0/search/'
+let gMap
+
+function TextOverlay(pos, text) {
     this.pos = pos
     this.text = text
     this.div = null
-    this.setMap(map)
+    this.setMap(gMap)
 }
 TextOverlay.prototype = new google.maps.OverlayView()
 TextOverlay.prototype.onAdd = function() {
@@ -25,7 +28,12 @@ TextOverlay.prototype.draw = function() {
     this.div.style.top = pos.y + 'px'
 }
 
-function fetch() {
+TextOverlay.prototype.remove = function() {
+    this.div.parentNode.removeChild(this.div)
+    this.div = null
+}
+
+function fetchO() {
     return Promise.resolve({
         marks: [
             {
@@ -42,15 +50,44 @@ function fetch() {
     })
 }
 
-gMapsLoaded.then(async map => {
-    let res = await fetch()
-    for (let mark of res.marks) {
-        let pos = new google.maps.LatLng(mark.lat, mark.lng)
-        new TextOverlay(map, pos, mark.text)
-        // new google.maps.Marker({
-        //     position: pos,
-        //     map: map,
-        //     title: 'test'
-        // })
+function buildRequest() {
+    return analysisAPI + arguments.join('/')
+}
+
+async function update() {
+    let center = gMap.getCenter()
+    let res = await fetch(buildRequest(center.lat(), center.lng(), 2, '1331856000.2', '2000000000.2'))
+    let json = await res.json()
+    for (let cluster of json.clusters) {
+        let mostPopularWord = ''
+        let mostPopularValue = 0
+        for (let key in cluster.words) {
+            let value = cluster.words[key]
+            if (value > mostPopularValue) {
+                mostPopularWord = key
+                mostPopularValue = value
+            }
+        }
+        new TextOverlay(new google.maps.LatLng(cluster.center[0], cluster.center[1]), popularWord)
     }
+}
+
+gMapsLoaded.then(async map => {
+    gMap = map
+    // map.panTo(new google.maps.LatLng())
+
+    // let res = await fetchO()
+    // for (let mark of res.marks) {
+    //     let pos = new google.maps.LatLng(mark.lat, mark.lng)
+    //     new TextOverlay(map, pos, mark.text)
+    //     // new google.maps.Marker({
+    //     //     position: pos,
+    //     //     map: map,
+    //     //     title: 'test'
+    //     // })
+    // }
+    update()
+    gMap.addListener('center_changed', update)
+    gMap.addListener('zoom_changed', update)
+    gMap.addListener('resize', update)
 })
