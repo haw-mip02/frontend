@@ -12,7 +12,8 @@ TextOverlay.prototype = new google.maps.OverlayView()
 TextOverlay.prototype.onAdd = function() {
     this.div = document.createElement('div')
     this.div.onclick = function() {
-        this.style.fontSize = this.style.fontSize ? (parseInt(this.style.fontSize.replace('px', '')) + 4) + 'px' : '16px'
+        // this.style.fontSize = this.style.fontSize ? (parseInt(this.style.fontSize.replace('px', '')) + 4) + 'px' : '16px'
+        document.querySelector('.side').classList.toggle('display-none')
     }
     this.div.textContent = this.text
     this.div.className = 'text-overlay'
@@ -33,6 +34,11 @@ TextOverlay.prototype.remove = function() {
     this.div = null
 }
 
+
+document.querySelector('.close-btn').onclick = function() {
+    this.parentNode.classList.toggle('display-none')
+}
+
 function fetchO() {
     return Promise.resolve({
         marks: [
@@ -51,7 +57,7 @@ function fetchO() {
 }
 
 function buildRequest() {
-    return analysisAPI + arguments.join('/')
+    return analysisAPI + [...arguments].join('/')
 }
 
 async function update() {
@@ -76,18 +82,19 @@ gMapsLoaded.then(async map => {
     gMap = map
     // map.panTo(new google.maps.LatLng())
 
-    // let res = await fetchO()
-    // for (let mark of res.marks) {
-    //     let pos = new google.maps.LatLng(mark.lat, mark.lng)
-    //     new TextOverlay(map, pos, mark.text)
-    //     // new google.maps.Marker({
-    //     //     position: pos,
-    //     //     map: map,
-    //     //     title: 'test'
-    //     // })
-    // }
-    update()
-    gMap.addListener('center_changed', update)
-    gMap.addListener('zoom_changed', update)
-    gMap.addListener('resize', update)
+    let res = await fetchO()
+    for (let mark of res.marks) {
+        let pos = new google.maps.LatLng(mark.lat, mark.lng)
+        new TextOverlay(pos, mark.text)
+        // new google.maps.Marker({
+        //     position: pos,
+        //     map: map,
+        //     title: 'test'
+        // })
+    }
+
+    // update()
+    // gMap.addListener('center_changed', update)
+    // gMap.addListener('zoom_changed', update)
+    // gMap.addListener('resize', update)
 })
