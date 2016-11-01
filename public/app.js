@@ -13,7 +13,7 @@ TextOverlay.prototype.onAdd = function() {
     this.div = document.createElement('div')
     this.div.onclick = function() {
         // this.style.fontSize = this.style.fontSize ? (parseInt(this.style.fontSize.replace('px', '')) + 4) + 'px' : '16px'
-        document.querySelector('.side').classList.toggle('display-none')
+        document.querySelector('.side').classList.remove('display-none')
     }
     this.div.textContent = this.text
     this.div.className = 'text-overlay'
