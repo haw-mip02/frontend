@@ -5,9 +5,11 @@ WORKDIR /usr/src/mip02_frontend
 
 COPY package.json /usr/src/mip02_frontend/
 RUN npm install
-RUN npm run build
 
 COPY . /usr/src/mip02_frontend
+
+RUN npm run build
+
 
 EXPOSE 80
 CMD [ "npm", "start" ]
