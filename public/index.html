@@ -6,14 +6,18 @@
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
-        <div class="side display-none">
+        <div id="map"></div>
+        <div class="side display-none">            
             <a class="close-btn">&times;</a>
-            <div class="side-inner-wrapper">
-                <div class="side-inner">
-                </div>
+            <div class="side-top">
+            </div>
+            <div id="information" class="information">
+                <div id="popularWords" class="popWords"></div>
+                <div id="connectetWords" class="conWords"></div>
+                <div id="popularTweets" class="popTweets"></div>
             </div>
         </div>
-        <div id="map"></div>
+        
         <script>
             let gMapsResolver
             let gMapsLoaded = new Promise((res, rej) => {
