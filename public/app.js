@@ -132,7 +132,7 @@ async function update() {
     let json = await res.json()
     
     //TestData
-    let json = getTestData()
+    //let json = getTestData()
     
     //drawCluster(json)
 }
