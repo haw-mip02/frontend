@@ -1,5 +1,5 @@
 
-let analysisAPI = 'http://192.168.99.100:39999/analysis/v1.0/search/'
+let analysisAPI = 'http://192.168.99.1:39999/analysis/v1.0/search/'
 let gMap
 
 
