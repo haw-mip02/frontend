@@ -1,5 +1,5 @@
 
-let analysisAPI = 'http://127.0.0.1:5000/analysis/v1.0/search/'
+let analysisAPI = 'http://192.168.99.100:39999/analysis/v1.0/search/'
 let gMap
 
 
@@ -126,15 +126,14 @@ function buildRequest() {
 }
 
 async function update() {
-    //HTTP Request
-    let center = gMap.getCenter()
-    let res = await fetch(buildRequest(center.lat(), center.lng(), getRad(), '1331856000.2', '2000000000.2'))
-    let json = await res.json()
+        //TestData
+        let testData = getTestData()    
+        drawCluster(testData)
     
-    //TestData
-    //let json = getTestData()
-    
-    //drawCluster(json)
+        let center = gMap.getCenter()
+        let res = await fetch(buildRequest(center.lat(), center.lng(), getRad(), '1331856000.2', '2000000000.2'))
+        let json = await res.json()
+        drawCluster(json)
 }
 
 gMapsLoaded.then(async map => {
@@ -195,7 +194,6 @@ function getTestData(){
                         words: 28,
                         and: 26,
                         their: 27,
-                        connection: 27,
                         strength: 81
                     },
                     someword2: {
@@ -204,12 +202,9 @@ function getTestData(){
                         and: 26,
                         their: 27,
                         connection: 27,
-                        strength: 81
                     },
                     someword3: {
                         other: 26,
-                        words: 28,
-                        and: 26,
                         their: 27,
                         connection: 27,
                         strength: 81
@@ -228,7 +223,8 @@ function getTestData(){
                         and: 26,
                         their: 27,
                         connection: 27,
-                        strength: 81
+                        strength: 81,
+                        testdata: 1
                     }
                     
                 },
@@ -244,7 +240,8 @@ function getTestData(){
                     and: 0.26,
                     their: 0.27,
                     connection: 0.27,
-                    strength: 0.81
+                    strength: 0.81,
+                    testdata: 1
                 },
                 words:{
                     someword: 5,
@@ -258,7 +255,8 @@ function getTestData(){
                     and: 26,
                     their: 27,
                     connection: 27,
-                    strength: 81
+                    strength: 81,
+                    testdata: 100
                 }
             }
         ],
