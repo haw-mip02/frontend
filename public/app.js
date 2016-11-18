@@ -1,5 +1,5 @@
 
-let analysisAPI = 'http://192.168.99.1:39999/analysis/v1.0/search/'
+let analysisAPI = 'http://127.0.0.1:5000/analysis/v1.0/search/'
 let gMap
 
 
@@ -127,8 +127,8 @@ function buildRequest() {
 
 async function update() {
         //TestData
-        let testData = getTestData()    
-        drawCluster(testData)
+        //let testData = getTestData()    
+        //drawCluster(testData)
     
         let center = gMap.getCenter()
         let res = await fetch(buildRequest(center.lat(), center.lng(), getRad(), '1331856000.2', '2000000000.2'))
