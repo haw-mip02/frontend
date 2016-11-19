@@ -1,5 +1,5 @@
 
-let analysisAPI = 'http://127.0.0.1:5000/analysis/v1.0/search/'
+let analysisAPI = 'http://mod-thiel1.ful.informatik.haw-hamburg.de:5000/analysis/v1.0/search/'
 let gMap
 
 
