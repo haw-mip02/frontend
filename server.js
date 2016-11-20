@@ -16,6 +16,11 @@ let server = http.createServer((req, res) => {
             res.writeHead(resQ.statusCode, resQ.statusMessage, resQ.headers)
             resQ.pipe(res)
         })
+        reqP.on('error', e => {
+            console.log(e)
+            res.statusCode = 500
+            res.end()
+        })
         reqP.end()
     } else {
         serve(req, res, finalhandler(req, res))
