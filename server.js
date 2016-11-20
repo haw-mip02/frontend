@@ -9,6 +9,7 @@ let server = http.createServer((req, res) => {
     if (req.url.indexOf('/analysis/') === 0) {
         let reqP = http.request({
             port: 5000,
+            host: 'analysis-rest',
             path: req.url,
             timeout: 5000
         }, resQ => {
