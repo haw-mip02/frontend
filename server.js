@@ -6,7 +6,20 @@ let serveStatic = require('serve-static')
 let serve = serveStatic('public', {'index': ['index.html']})
 
 let server = http.createServer((req, res) => {
-  serve(req, res, finalhandler(req, res))
+    if (req.url.indexOf('/analysis/') === 0) {
+        let reqP = http.request({
+            port: 5000,
+            path: req.url,
+            timeout: 5000
+        }, resQ => {
+            delete resQ.headers['content-length']
+            res.writeHead(resQ.statusCode, resQ.statusMessage, resQ.headers)
+            resQ.pipe(res)
+        })
+        reqP.end()
+    } else {
+        serve(req, res, finalhandler(req, res))
+    }
 })
 
 server.listen(80)

@@ -1,5 +1,5 @@
 
-let analysisAPI = 'http://mod-thiel1.ful.informatik.haw-hamburg.de:5000/analysis/v1.0/search/'
+let analysisAPI = '/analysis/v1.0/search/'
 let gMap
 
 
@@ -20,7 +20,7 @@ TextOverlay.prototype.onAdd = function() {
     this.div = document.createElement('div')
     let c = this.cluster
     this.div.onclick = function() {
-        document.querySelector('.side').classList.remove('display-none')    
+        document.querySelector('.side').classList.remove('display-none')
         let i = new InfoBox(c)
         i.clear()
         i.drawPopWords()
@@ -76,7 +76,7 @@ InfoBox.prototype.clear = function(){
 
 InfoBox.prototype.clearBox = function(element){
     while(element.childElementCount > 0){
-        element.removeChild(element.firstChild);    
+        element.removeChild(element.firstChild);
     }
 }
 
@@ -86,7 +86,7 @@ InfoBox.prototype.FillBox = function(box, tags){
         let link = document.createElement('a')
         let name = document.createElement('div')
         let info = document.createElement('div')
-        
+
         let i = this
         link.href = "javascript:void(0)"
         if(tag in this.cluster.connections){
@@ -94,14 +94,14 @@ InfoBox.prototype.FillBox = function(box, tags){
         }else{
             link.onclick = function(){}
         }
-        
+
         name.innerHTML = tag
         name.style.fontSize = "20px"
-        
+
         info.innerHTML = this.cluster.words[tag] + " mentions | Sentiment: " + this.cluster.polarities[tag]
         info.style.fontSize = "15px"
 
-        
+
         link.appendChild(name)
         link.appendChild(info)
         box.appendChild(link)
@@ -127,9 +127,9 @@ function buildRequest() {
 
 async function update() {
         //TestData
-        //let testData = getTestData()    
+        //let testData = getTestData()
         //drawCluster(testData)
-    
+
         let center = gMap.getCenter()
         let res = await fetch(buildRequest(center.lat(), center.lng(), getRad(), '1331856000.2', '2000000000.2'))
         let json = await res.json()
@@ -137,7 +137,7 @@ async function update() {
 }
 
 gMapsLoaded.then(async map => {
-    gMap = map 
+    gMap = map
     gMap.addListener('idle', update)
 })
 
@@ -156,7 +156,7 @@ function getRad(){
 function drawCluster(data){
     for(let cluster of data.clusters){
         let pos = new google.maps.LatLng(cluster.center[0], cluster.center[1])
-            
+
         let mostPopularWord = ''
         let mostPopularValue = 0
         for (let key in cluster.words) {
@@ -166,9 +166,9 @@ function drawCluster(data){
                 mostPopularValue = value
             }
         }
-            
+
         new TextOverlay(pos, mostPopularWord, cluster)
-        
+
     }
 }
 
@@ -217,7 +217,7 @@ function getTestData(){
                         connection: 27,
                         strength: 81
                     },
-                    someotherword: { 
+                    someotherword: {
                         other: 26,
                         words: 28,
                         and: 26,
@@ -226,7 +226,7 @@ function getTestData(){
                         strength: 81,
                         testdata: 1
                     }
-                    
+
                 },
                 polarities: {
                     someword: 0.5,
