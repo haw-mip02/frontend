@@ -1,17 +1,19 @@
 
 let analysisAPI = '/analysis/v1.0/search/'
 let gMap
-
+let iDisplay
 
 
 //----------TextOverlay-Begin----------//
 
-function TextOverlay(pos, text, cluster) {
+function TextOverlay(pos, text, cluster, bColor, iBox) {
     this.pos = pos
     this.text = text
     this.div = null
     this.setMap(gMap)
     this.cluster = cluster
+    this.bColor = bColor
+    this.iBox = iDisplay
 }
 
 TextOverlay.prototype = new google.maps.OverlayView()
@@ -19,11 +21,11 @@ TextOverlay.prototype = new google.maps.OverlayView()
 TextOverlay.prototype.onAdd = function() {
     this.div = document.createElement('div')
     let c = this.cluster
+    let iB = this.iBox
     this.div.onclick = function() {
-        document.querySelector('.side').classList.remove('display-none')
-        let i = new InfoBox(c)
-        i.clear()
-        i.drawPopWords()
+        document.querySelector('.side').classList.remove('display-none')  
+        iB.cluster = c
+        iB.draw()
     }
     this.div.textContent = this.text
     this.div.className = 'text-overlay'
@@ -31,6 +33,7 @@ TextOverlay.prototype.onAdd = function() {
     this.div.style.left = pos.x + 'px'
     this.div.style.top = pos.y + 'px'
     this.getPanes().floatPane.appendChild(this.div)
+    this.div.style.backgroundColor = this.bColor 
 }
 // Position erneuern wenn z.B. gezoomed wird
 TextOverlay.prototype.draw = function() {
@@ -51,69 +54,144 @@ TextOverlay.prototype.remove = function() {
 
 //----------Informationbox-Begin----------//
 
-function InfoBox(cluster){
+function InfoBox(){
+    this.topNav = document.getElementById("navigationBar")
     this.popWord = document.getElementById("popularWords")
-    this.conWord = document.getElementById("connectetWords")
-    this.popTweets = document.getElementById("popularTweets")
-    this.cluster = cluster
+    this.diagram = document.getElementById('dia')
+    this.cluster = null
+    this.selectedWord = null
 }
 
-InfoBox.prototype.drawPopWords = function(){
-     let tags = Object.keys(this.cluster.connections)
-     this.FillBox(this.popWord, tags)
-}
-
-InfoBox.prototype.drawConWords = function(word){
-    let tags = Object.keys(this.cluster.connections[word])
-    this.FillBox(this.conWord, tags)
-}
-
-InfoBox.prototype.clear = function(){
-    this.clearBox(this.popWord)
-    this.clearBox(this.conWord)
-    this.clearBox(this.popTweets)
-}
-
-InfoBox.prototype.clearBox = function(element){
-    while(element.childElementCount > 0){
-        element.removeChild(element.firstChild);
+InfoBox.prototype.draw = function(){
+    if(this.cluster != null){
+        this.clearAll()
+        this.drawPopWords()
+        this.drawChart()
     }
 }
 
-InfoBox.prototype.FillBox = function(box, tags){
-    this.clearBox(box)
+InfoBox.prototype.createDiaData = function(){
+    if(this.selectedWord == null){
+        let data = [['Popular Word','Mentions', {role: 'style'}]]
+        for (let key in this.cluster.connections) {
+            data.push([key, this.cluster.words[key], sentimentToColor(this.cluster.polarities[key])])
+        }
+        return data
+    }else{
+        let data = [['Connected Words','Mentions', {role: 'style'}]]
+        for (let key in this.cluster.connections[this.selectedWord]) {
+            data.push([key, this.cluster.connections[this.selectedWord][key], sentimentToColor(this.cluster.polarities[key])])
+        }
+        return data
+    }
+}
+
+InfoBox.prototype.drawChart = function(){
+    let arrayData = this.createDiaData()
+    var data = google.visualization.arrayToDataTable(arrayData)
+    let title = (this.selectedWord == null ? 'Popular Words' : 'Connected Words')
+    
+    var options = {
+        'legend': {position: 'none'},
+        'title':title,
+        'is3D':true
+    }
+    
+    var chart = new google.visualization.BarChart(this.diagram);
+    chart.draw(data, options);
+}  
+
+InfoBox.prototype.drawPopWords = function(){
+    let tags = Object.keys(this.cluster.connections)
+    let box = this.popWord
     for(let tag of tags){
         let link = document.createElement('a')
         let name = document.createElement('div')
         let info = document.createElement('div')
-
+        
         let i = this
         link.href = "javascript:void(0)"
-        if(tag in this.cluster.connections){
-            link.onclick = function(){i.drawConWords(tag)}
+        let iBox = this
+        if(this.selectedWord != null && tag == this.selectedWord){
+            link.onclick = function(){iBox.selectedWord = null; iBox.draw()}
+            link.style.backgroundColor = '#DCDCDC'
         }else{
-            link.onclick = function(){}
+            link.onclick = function(){iBox.selectedWord = tag; iBox.draw()}
         }
-
+        
         name.innerHTML = tag
         name.style.fontSize = "20px"
-
+        
         info.innerHTML = this.cluster.words[tag] + " mentions | Sentiment: " + this.cluster.polarities[tag]
         info.style.fontSize = "15px"
 
-
+        
         link.appendChild(name)
         link.appendChild(info)
         box.appendChild(link)
      }
 }
 
-InfoBox.prototype.drawTweets+function(word){
+
+
+InfoBox.prototype.clearBox = function(element){
+    while(element.childElementCount > 0){
+        element.removeChild(element.firstChild);    
+    }
+}
+
+InfoBox.prototype.clearAll = function(){
+    this.clearBox(this.popWord)
+    this.clearBox(this.topNav)
+    this.clearBox(this.diagram)
+}
+
+InfoBox.prototype.drawTweets = function(word){
     alert("Tweets not implemented")
 }
 
 //----------Informationbox-End----------//
 
+
+
+//----------Color-Calculation-Begin----------//
+
+function sentimentToColor(sVal){
+    var hue = sVal * 120 / 360;
+    let sat = 1
+    let light = 0.5
+    
+    var rgb = hslToRgb(hue, sat, light);
+    
+    return 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'
+}
+
+function hslToRgb(h, s, l){
+    var r, g, b;
+
+    if(s == 0){
+        r = g = b = l;
+    }else{
+        function hue2rgb(p, q, t){
+            if(t < 0) t += 1;
+            if(t > 1) t -= 1;
+            if(t < 1/6) return p + (q - p) * 6 * t;
+            if(t < 1/2) return q;
+            if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        }
+
+        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        var p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+    }
+
+    return [Math.floor(r * 255), Math.floor(g * 255), Math.floor(b * 255)];
+}
+
+//----------Color-Calculation-End----------//
 
 
 
@@ -127,17 +205,20 @@ function buildRequest() {
 
 async function update() {
         //TestData
-        //let testData = getTestData()
-        //drawCluster(testData)
-
-        let center = gMap.getCenter()
-        let res = await fetch(buildRequest(center.lat(), center.lng(), getRad(), '1331856000.2', '2000000000.2'))
-        let json = await res.json()
-        drawCluster(json)
+        let testData = getTestData()    
+        drawCluster(testData)
+    
+        //let center = gMap.getCenter()
+        //let res = await fetch(buildRequest(center.lat(), center.lng(), getRad(), '1331856000.2', '2000000000.2'))
+        //let json = await res.json()
+        //drawCluster(json)
 }
 
 gMapsLoaded.then(async map => {
-    gMap = map
+    iDisplay = new InfoBox()
+
+    window.addEventListener("resize", function(){iDisplay.draw()})
+    gMap = map 
     gMap.addListener('idle', update)
 })
 
@@ -156,7 +237,7 @@ function getRad(){
 function drawCluster(data){
     for(let cluster of data.clusters){
         let pos = new google.maps.LatLng(cluster.center[0], cluster.center[1])
-
+            
         let mostPopularWord = ''
         let mostPopularValue = 0
         for (let key in cluster.words) {
@@ -166,9 +247,10 @@ function drawCluster(data){
                 mostPopularValue = value
             }
         }
-
-        new TextOverlay(pos, mostPopularWord, cluster)
-
+        
+        let bColor = sentimentToColor(cluster.polarities[mostPopularWord])
+        new TextOverlay(pos, mostPopularWord, cluster, bColor)
+        
     }
 }
 
@@ -217,7 +299,7 @@ function getTestData(){
                         connection: 27,
                         strength: 81
                     },
-                    someotherword: {
+                    someotherword: { 
                         other: 26,
                         words: 28,
                         and: 26,
@@ -226,7 +308,7 @@ function getTestData(){
                         strength: 81,
                         testdata: 1
                     }
-
+                    
                 },
                 polarities: {
                     someword: 0.5,
@@ -241,7 +323,7 @@ function getTestData(){
                     their: 0.27,
                     connection: 0.27,
                     strength: 0.81,
-                    testdata: 1
+                    testdata: 0.5
                 },
                 words:{
                     someword: 5,
