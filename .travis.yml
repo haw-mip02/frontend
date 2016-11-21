@@ -1,11 +1,7 @@
 sudo: required
 
 notifications:
-  slack:
-    rooms:
-      -dasasozialenetzwerk:$SLACK_TOKEN#travis-ci
-    on_success: always
-    on_failure: always
+  slack: dasasozialenetzwerk:4PhxD0MXSGMtzxSawPrO9BKm
 
 services:
   - docker
