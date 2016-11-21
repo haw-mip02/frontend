@@ -2,6 +2,8 @@ sudo: required
 
 notifications:
   slack: 'dasasozialenetzwerk:$SLACK_TOKEN'
+    on_success: always
+    on_failure: always
 
 services:
   - docker
