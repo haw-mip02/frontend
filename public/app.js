@@ -1,7 +1,8 @@
 
-let analysisAPI = '/analysis/v1.0/search/'
+let analysisAPI = 'http://hqor.de:16500/analysis/v1.0/search/'
 let gMap
 let iDisplay
+let textOverlays = []
 
 
 //----------TextOverlay-Begin----------//
@@ -43,6 +44,9 @@ TextOverlay.prototype.draw = function() {
 }
 
 TextOverlay.prototype.remove = function() {
+	this.setMap(null)
+}
+TextOverlay.prototype.onRemove = function() {
     this.div.parentNode.removeChild(this.div)
     this.div = null
 }
@@ -203,15 +207,24 @@ function buildRequest() {
     return analysisAPI + [...arguments].join('/')
 }
 
+function removeTextOverlays() {
+	for (let overlay of textOverlays) {
+		overlay.remove()
+	}
+	textOverlays = []
+}
+
 async function update() {
         //TestData
-        let testData = getTestData()    
-        drawCluster(testData)
+        //let testData = getTestData()    
+        //drawCluster(testData)
+		
+		removeTextOverlays()
     
-        //let center = gMap.getCenter()
-        //let res = await fetch(buildRequest(center.lat(), center.lng(), getRad(), '1331856000.2', '2000000000.2'))
-        //let json = await res.json()
-        //drawCluster(json)
+        let center = gMap.getCenter()
+        let res = await fetch(buildRequest(center.lat(), center.lng(), getRad(), '1331856000.2', '2000000000.2'))
+        let json = await res.json()
+        drawCluster(json)
 }
 
 gMapsLoaded.then(async map => {
@@ -236,7 +249,7 @@ function getRad(){
 //Zeichnet die Cluster auf der Map ein
 function drawCluster(data){
     for(let cluster of data.clusters){
-        let pos = new google.maps.LatLng(cluster.center[0], cluster.center[1])
+        let pos = new google.maps.LatLng(cluster.center[1], cluster.center[0])
             
         let mostPopularWord = ''
         let mostPopularValue = 0
@@ -249,8 +262,7 @@ function drawCluster(data){
         }
         
         let bColor = sentimentToColor(cluster.polarities[mostPopularWord])
-        new TextOverlay(pos, mostPopularWord, cluster, bColor)
-        
+		textOverlays.push(new TextOverlay(pos, mostPopularWord, cluster, bColor))
     }
 }
 
@@ -260,7 +272,7 @@ function getTestData(){
     return {
         clusters: [
             {
-                center: [53.557047, 10.023038],
+                center: [10.023038, 53.557047],
                 connections: {
                     someword: {
                         someword1: 15,
