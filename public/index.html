@@ -4,25 +4,31 @@
         <meta charset="utf-8">
         <title>Twitter-Mood-Map - MIP02</title>
         <link rel="stylesheet" href="styles.css">
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     </head>
     <body>
         <div id="map"></div>
         <div class="side display-none">            
             <a class="close-btn">&times;</a>
             <div class="side-top">
+                <ul class="topnav" id="navigationBar">
+                    <!--<li><a href="#home">Home</a></li>-->
+                </ul>
             </div>
             <div id="information" class="information">
                 <div id="popularWords" class="popWords"></div>
-                <div id="connectetWords" class="conWords"></div>
-                <div id="popularTweets" class="popTweets"></div>
             </div>
+            <div id="dia" class="diagram"></div>
+            <!--<div id='filter' class= 'filterWindow'></div>-->
+
         </div>
-        
-        <script>
-            let gMapsResolver
+        <script>         
+            var x = 5;
+            let gMapsResolver;
             let gMapsLoaded = new Promise((res, rej) => {
-                gMapsResolver = res
-            })
+                gMapsResolver = res;
+            });
+            
             function initMap() {
                 let map = new google.maps.Map(document.getElementById('map'), {
                   zoom: 14,
@@ -31,10 +37,15 @@
                       lng: 9.992694
                   },
                   disableDoubleClickZoom: true
-                })
-                gMapsResolver(map)
+                });
+                
+
+                google.charts.load('current', {packages: ['corechart']});
+                google.charts.setOnLoadCallback(gMapsResolver(map));
+                //gMapsResolver(map)
             }
         </script>
+        
         <script src="http://maps.google.com/maps/api/js?callback=initMap"></script>
         <script src="build/app.js"></script>
     </body>
